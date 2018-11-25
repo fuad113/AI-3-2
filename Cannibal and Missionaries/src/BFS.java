@@ -1,4 +1,6 @@
 import java.lang.reflect.Array;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.*;
 
 public class BFS {
@@ -74,8 +76,8 @@ public class BFS {
         }
 
         long execend=System.currentTimeMillis();
-        long exectime=(long)((execend-excecstart)/1000);
-
+        long exectime= (long) (execend-excecstart);
+        float time=exectime/1000.0f;
 
 
         if(target==null){
@@ -103,10 +105,10 @@ public class BFS {
                 }
                 else
                 {
-                    System.out.println("(" + path.get(i).getmissionariesleft()+","+path.get(i).getcanniballeft()+
-                            ","+path.get(i).getmissionariesright()+","+path.get(i).getcannibalright()+")" +
-                            "<-" + "("+path.get(i-1).getmissionariesleft()+","+path.get(i-1).getcanniballeft()+
-                            ","+path.get(i-1).getmissionariesright()+","+path.get(i-1).getcannibalright()+")" );
+                    System.out.println("(" + path.get(i-1).getmissionariesleft()+","+path.get(i-1).getcanniballeft()+
+                            ","+path.get(i-1).getmissionariesright()+","+path.get(i-1).getcannibalright()+")" +
+                            "<-" + "("+path.get(i).getmissionariesleft()+","+path.get(i).getcanniballeft()+
+                            ","+path.get(i).getmissionariesright()+","+path.get(i).getcannibalright()+")" );
                 }
 
                 check=!check;
@@ -115,7 +117,8 @@ public class BFS {
         }
 
         System.out.println();
-        System.out.println("BFS execution time: "+(long)exectime+"s");
+        System.out.print("BFS execution time: ");
+        System.out.format("%.3f s",time);
 
     }
 

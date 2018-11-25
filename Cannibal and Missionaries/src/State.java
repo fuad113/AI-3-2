@@ -73,7 +73,6 @@ public class State {
         return parentstate;
     }
 
-
     public void setmissionariesleft(int mleft)
     {
         this.mleft=mleft;
@@ -83,6 +82,7 @@ public class State {
     {
         this.cleft=cleft;
     }
+
     public void setmissionariesright(int mright)
     {
         this.mright=mright;

@@ -8,7 +8,7 @@ public class Main {
     public static List<Integer> missionariesmove = new ArrayList<Integer>();
     public static List<Integer> cannibalmoves = new ArrayList<Integer>();
     public static List<State> visitedstatelist = new ArrayList<State>();
-    public static long timeout=30;
+    public static long timeout=600000;
 
     public static boolean checkvisited(State state) {
 
@@ -49,6 +49,7 @@ public class Main {
         State state = new State(m, c, 0, 0, 0);
 
         //bfs
+
         System.out.println("BFS solution:");
         System.out.println();
         BFS bfs=new BFS();
@@ -56,6 +57,7 @@ public class Main {
         bfs.bfs(state);
         System.out.println();
         System.out.println("Total nodes visited for BFS: "+visitedstatelist.size());
+
 
         //clearing list for DFS
         visitedstatelist.clear();
@@ -72,7 +74,8 @@ public class Main {
         dfs.dfs(state);
         long execend=System.currentTimeMillis();
 
-        long exectime=(long)((execend-execstart)/1000);
+        long exectime=(long)(execend-execstart);
+        float time=exectime/1000.0f;
 
 
         //printing the path
@@ -104,10 +107,10 @@ public class Main {
                 }
                 else
                 {
-                    System.out.println("(" + path.get(i).getmissionariesleft()+","+path.get(i).getcanniballeft()+
-                            ","+path.get(i).getmissionariesright()+","+path.get(i).getcannibalright()+")" +
-                            "<-" + "("+path.get(i-1).getmissionariesleft()+","+path.get(i-1).getcanniballeft()+
-                            ","+path.get(i-1).getmissionariesright()+","+path.get(i-1).getcannibalright()+")" );
+                    System.out.println("(" + path.get(i-1).getmissionariesleft()+","+path.get(i-1).getcanniballeft()+
+                            ","+path.get(i-1).getmissionariesright()+","+path.get(i-1).getcannibalright()+")" +
+                            "<-" + "("+path.get(i).getmissionariesleft()+","+path.get(i).getcanniballeft()+
+                            ","+path.get(i).getmissionariesright()+","+path.get(i).getcannibalright()+")" );
                 }
 
                 check=!check;
@@ -116,7 +119,9 @@ public class Main {
         }
 
         System.out.println();
-        System.out.println("DFS execution time:"+(long)exectime+"s");
+        System.out.print("DFS execution time: ");
+        System.out.format("%.3f s",time);
+
 
 
         System.out.println();
