@@ -8,7 +8,7 @@ public class Main {
     public static List<Integer> missionariesmove = new ArrayList<Integer>();
     public static List<Integer> cannibalmoves = new ArrayList<Integer>();
     public static List<State> visitedstatelist = new ArrayList<State>();
-    public static long timeout=600000;
+    public static long timeout=30;
 
     public static boolean checkvisited(State state) {
 
