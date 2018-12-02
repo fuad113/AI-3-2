@@ -422,21 +422,14 @@ bool ISsolvable(Node node)
 
 int main()
 {
+    freopen("input.txt","r",stdin);
+    freopen("output.txt","w",stdout);
+
     Node startnode;
     Node goalnode;
 
-    int size=3;
-    int hchoice;
-
-    ///for n=3
-    //int arr[3][3]= {{1,2,3},{4,5,6},{8,7,0}}; //this is for non-solvable testing
-    int arr[3][3]= {{8,1,3},{4,0,2},{7,6,5}};
-    int goal[3][3]= {{1,2,3},{4,5,6},{7,8,0}};
-
-    ///for n=4
-    //int arr[4][4]={{1,2,3,4},{5,6,7,8},{9,10,0,11},{13,14,15,12}};
-    //int goal[4][4]={{1,2,3,4},{5,6,7,8},{9,10,11,12},{13,14,15,0}};
-
+    int size;
+    cin>> size;
 
     //making the start node and the goal node
     startnode.size=size;
@@ -444,8 +437,8 @@ int main()
     {
         for(int j=0; j<size; j++)
         {
+            cin >> startnode.board[i][j];
 
-            startnode.board[i][j]=arr[i][j];
         }
 
     }
@@ -456,52 +449,61 @@ int main()
     {
         for(int j=0; j<size; j++)
         {
-            goalnode.board[i][j]=goal[i][j];
+            cin>>goalnode.board[i][j];
         }
 
     }
 
-    goalnode.board[size-1][size-1]=0;
 
     bool solvablecheck= ISsolvable(startnode);
 
     if(solvablecheck)
     {
         cout<< "The puzzle is solvable\n\n";
-        cout<< "Choose the Heuristic Type: \n\n";
-        cout<< "1.Hamming distance \n2.Manhattan distance \n3.Linear Conflict\n\n";
-        cout<< "Heuristic choice: ";
-        cin>> hchoice;
 
-        AStar(startnode,goalnode,hchoice);
-
-        //printing the path/solve steps
-        vector<Node> path;
-        Node current=goalnode;
-        while(current.size!=0)
+        for(int k=1; k<=3; k++)
         {
-            path.push_back(current);
-            current=parent[current];
+            if(k==1)
+                cout<< "----------------Hamming Distance as heuristic----------------\n\n";
+            else if(k==2)
+                cout<< "----------------Manhattan Distance as heuristic----------------\n\n";
+            else
+                cout<< "----------------Linear Conflict as heuristic----------------\n\n";
 
+
+            AStar(startnode,goalnode,k);
+
+            cout << "Number of Nodes Explored: "<< node_explored << "\n";
+            cout << "Number of Nodes Expanded: "<< node_expanded << "\n";
+            cout << "Optimal cost to reach the goal state: " << cost[goalnode] << "\n\n";
+            cout << "Solving steps:\n\n";
+
+            //printing the path/solve steps
+            vector<Node> path;
+            Node current=goalnode;
+            while(current.size!=0)
+            {
+                path.push_back(current);
+                current=parent[current];
+
+            }
+
+            reverse(path.begin(),path.end());
+
+            for(int i=0; i<path.size(); i++)
+            {
+                path[i].print();
+            }
+
+
+            parent.clear();
+            cost.clear();
+            closedList.clear();
+            path.clear();
+            node_expanded=0;
+            node_explored=0;
         }
 
-        reverse(path.begin(),path.end());
-
-
-
-        for(int i=0; i<path.size(); i++)
-        {
-            path[i].print();
-        }
-
-        cout << "Number of Nodes Explored: "<< node_explored << "\n";
-        cout << "Number of Nodes Expanded: "<< node_expanded << "\n";
-
-        cout << "Optimal cost to reach the goal state: " << cost[goalnode] << "\n";
-
-        parent.clear();
-        cost.clear();
-        closedList.clear();
     }
 
     else
