@@ -73,8 +73,12 @@ public:
 
             for(int j=0; j<size; j++)
             {
-
-                cout<< board[i][j] << " ";
+                if(board[i][j]==0)
+                {
+                    cout<< "  ";
+                }
+                else
+                    cout<< board[i][j] << " ";
             }
             cout<< "\n";
         }
@@ -153,15 +157,15 @@ int ManhattanDistance(Node curr, Node goal)
 int LinearConflict(Node curr,Node goal)
 {
 
-    int size=curr.size;
-    int xval[size*size];
-    int yval[size*size];
+    int sz=curr.size;
+    int xval[sz*sz];
+    int yval[sz*sz];
     int tempx,tempy,counter=0;
 
 
-    for(int i=0; i<size; i++)
+    for(int i=0; i<sz; i++)
     {
-        for(int j=0; j<size; j++)
+        for(int j=0; j<sz; j++)
         {
             xval[goal.board[i][j]]=i;
             yval[goal.board[i][j]]=j;
@@ -170,17 +174,19 @@ int LinearConflict(Node curr,Node goal)
 
     //counting linear conflict in row
 
-    for(int i=0; i<size; i++)
+    for(int i=0; i<sz; i++)
     {
-        for(int j=0; j<size-1; j++)
+        for(int j=0; j<sz-1; j++)
         {
             tempx=curr.board[i][j];
-            for(int k=j+1; k<size; k++)
+            for(int k=j+1; k<sz; k++)
             {
                 tempy=curr.board[i][k];
 
-                if(xval[tempx]==i && xval[tempy]==i && yval[tempx] > yval[tempy] )
-                    counter++;
+                if( (xval[tempx]==i && xval[tempy]==i) && yval[tempx] > yval[tempy] )
+                    {
+                        counter++;
+                    }
 
             }
         }
@@ -190,17 +196,19 @@ int LinearConflict(Node curr,Node goal)
 
     //counting linear conflict in column
 
-    for(int i=0; i<size; i++)
+    for(int i=0; i<sz; i++)
     {
-        for(int j=0; j<size-1; j++)
+        for(int j=0; j<sz-1; j++)
         {
             tempx=curr.board[j][i];
-            for(int k=j+1; k<size; k++)
+            for(int k=j+1; k<sz; k++)
             {
                 tempy=curr.board[k][i];
 
-                if(yval[tempx]==i && yval[tempy]==i && xval[tempx] > xval[tempy] )
-                    counter++;
+                if((yval[tempx]==i && yval[tempy]==i) && xval[tempx] > xval[tempy] )
+                    {
+                        counter++;
+                    }
 
             }
         }
@@ -219,11 +227,11 @@ int LinearConflict(Node curr,Node goal)
 
 int CalculateHeuristicvalue(int choice,Node curr,Node goal)
 {
-    if(choice==1)
+    if(choice == 1)
         return HammingDistance(curr,goal);
-    else if(choice==2)
+    else if(choice == 2)
         return ManhattanDistance(curr,goal);
-    else if(choice==3)
+    else if(choice == 3)
     {
         int mdist=ManhattanDistance(curr,goal);
         int lcon=LinearConflict(curr,goal);
