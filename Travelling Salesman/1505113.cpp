@@ -154,6 +154,34 @@ int FindMinimizedEdge2()
 
 }
 
+void PrintPath()
+{
+    for(int i=0; i<path.size(); i++)
+    {
+        if(i==path.size()-1)
+            cout<< path[i] << endl;
+        else
+            cout<< path[i] << " -> " ;
+    }
+
+
+}
+
+float CalculateCost()
+{
+    float ans=0;
+
+    for(int i=0; i<path.size()-1; i++)
+    {
+        int temp=CalculateDistanceTwoNodes(cities[path[i]],cities[path[i+1]]);
+
+        ans+= sqrt(temp*1.0);
+    }
+
+    return ans;
+
+}
+
 /// Nearest Neighbour Heuristic implementation
 
 void NearestNeighbour(int startnodeindex)
@@ -251,37 +279,50 @@ void CheapestInsertion(int startindex)
 
 }
 
+///2-opt Heuristic implementation
 
-void PrintPath()
+void TwoOpt(int startindex)
 {
-    for(int i=0; i<path.size(); i++)
-    {
-        if(i==path.size()-1)
-            cout<< path[i] << endl;
-        else
-            cout<< path[i] << " -> " ;
-    }
+    path.clear();
+    memset(visited,0,sizeof(visited));
 
+    NearestNeighbour(startindex);
+
+    float best=CalculateCost();
+    float temp_cost;
+    bool flag;
+
+
+    while(true)
+    {
+        flag=false;
+        for(int i=1;i<path.size()-2;i++)
+        {
+            for(int k=i+1;k<path.size()-1;k++)
+            {
+                reverse(path.begin()+i,path.begin()+k+1);
+                temp_cost=CalculateCost();
+
+                if(temp_cost < best)
+                {
+                    best=temp_cost;
+                    flag=true;
+                    break;
+                }
+                reverse(path.begin()+i,path.begin()+k+1);
+            }
+            if(flag==true)
+                break;
+        }
+
+        if(flag==false)
+            break;
+
+    }
 
 }
 
-float CalculateCost()
-{
-    float ans=0;
-
-    for(int i=0; i<path.size()-1; i++)
-    {
-        int temp=CalculateDistanceTwoNodes(cities[path[i]],cities[path[i+1]]);
-
-        ans+= sqrt(temp*1.0);
-    }
-
-    return ans;
-
-}
-
-
-
+///3-opt Heuristic implementation
 
 
 int main()
@@ -294,9 +335,13 @@ int main()
     }
 
 
-    int startnode=6;
+    int startnode=0;
 
     cout<< "Start Node is at index : " << startnode << endl;
+
+   /* NearestNeighbour(startnode);
+    PrintPath();
+    cout<< "cost : " << CalculateCost() << endl;
 
     NearestInsertion(startnode);
     PrintPath();
@@ -304,7 +349,12 @@ int main()
 
     CheapestInsertion(startnode);
     PrintPath();
+    cout<< "cost : " << CalculateCost() << endl;*/
+
+    TwoOpt(startnode);
+    PrintPath();
     cout<< "cost : " << CalculateCost() << endl;
+
 
 
     return 0;
