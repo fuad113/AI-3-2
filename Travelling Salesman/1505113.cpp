@@ -58,6 +58,41 @@ int FindClosestUnvisitedNode(int node)
 
 }
 
+int FindClosestUnvisitedNodeRandomly(int node)
+{
+    float mindistance=100000;
+    int index=-1;
+    vector<pair<float,int>> v;
+
+    for(int i=1; i<=n; i++)
+    {
+        if(visited[i]==true)
+            continue;
+
+        if(CalculateDistanceTwoNodes(cities[i],cities[node]) < mindistance)
+        {
+            mindistance=CalculateDistanceTwoNodes(cities[i],cities[node]);
+            v.push_back({mindistance,i});
+        }
+
+    }
+
+    ///we have to choose 5 best nodes
+    ///we choose this by sorting
+
+    sort(v.begin(),v.end());
+
+    int k=5;
+
+    if(v.size()<= k)
+        k=v.size();
+
+    int temp= rand()%k;
+
+
+    return v[temp].second;
+}
+
 
 int FindNearestTotalGraph()
 {
@@ -129,20 +164,20 @@ int FindMinimizedEdge2()
         i=path[k];
         j=path[(k+1)%s];
 
-        for(int r=0;r<n;r++)
+        for(int r=0; r<n; r++)
         {
 
-          if(visited[r]==true)
+            if(visited[r]==true)
                 continue;
 
-          temp=CalculateDistanceTwoNodes(cities[i],cities[r])+CalculateDistanceTwoNodes(cities[r],cities[j])- CalculateDistanceTwoNodes(cities[i],cities[j]);
+            temp=CalculateDistanceTwoNodes(cities[i],cities[r])+CalculateDistanceTwoNodes(cities[r],cities[j])- CalculateDistanceTwoNodes(cities[i],cities[j]);
 
-          if(temp < mindistance)
-          {
-            mindistance=temp;
-            index=i;
-            city=r;
-          }
+            if(temp < mindistance)
+            {
+                mindistance=temp;
+                index=i;
+                city=r;
+            }
 
         }
 
@@ -208,72 +243,86 @@ void NearestNeighbour(int startnodeindex)
 
 }
 
+
+///Nearest Neighbour Heuristic Implementation (Randomized)
+void NearestNeighbourRandomized(int startnodeindex)
+{
+
+    path.clear();
+    memset(visited,0,sizeof(visited));
+
+    int temp;
+    int lastvisited=startnodeindex;
+    visited[startnodeindex]=true;
+    path.push_back(startnodeindex);
+
+    while(path.size()<n)
+    {
+        temp=FindClosestUnvisitedNodeRandomly(lastvisited);
+        visited[temp]=true;
+        path.push_back(temp);
+        lastvisited=temp;
+    }
+
+    path.push_back(startnodeindex);
+
+}
+
 ///savings Heuristic Implementation
 
 void Savings(int startIndex)
 {
-   path.clear();
-   memset(visited,0,sizeof(visited));
+    path.clear();
+    memset(visited,0,sizeof(visited));
 
-   deque<int> dq;
+    deque<int> dq;
 
-   visited[startIndex]=true;
+    visited[startIndex]=true;
 
-   float savings[n+1][n+1];
-   memset(savings,0,sizeof(savings));
+    float savings[n+1][n+1];
+    memset(savings,0,sizeof(savings));
 
-   for(int i=1;i<=n;i++)
-   {
-       for(int j=i+1;j<=n;j++)
-       {
-           if(i!= startIndex && j!= startIndex)
-           {
-           savings[i][j]=CalculateDistanceTwoNodes(cities[startIndex],cities[i])+
-           CalculateDistanceTwoNodes(cities[startIndex],cities[j])-
-           CalculateDistanceTwoNodes(cities[i],cities[j]);
+    for(int i=1; i<=n; i++)
+    {
+        for(int j=i+1; j<=n; j++)
+        {
+            if(i!= startIndex && j!= startIndex)
+            {
+                savings[i][j]=CalculateDistanceTwoNodes(cities[startIndex],cities[i])+
+                              CalculateDistanceTwoNodes(cities[startIndex],cities[j])-
+                              CalculateDistanceTwoNodes(cities[i],cities[j]);
 
-           savings[j][i]=CalculateDistanceTwoNodes(cities[startIndex],cities[i])+
-           CalculateDistanceTwoNodes(cities[startIndex],cities[j])-
-           CalculateDistanceTwoNodes(cities[i],cities[j]);
-           }
+                savings[j][i]=CalculateDistanceTwoNodes(cities[startIndex],cities[i])+
+                              CalculateDistanceTwoNodes(cities[startIndex],cities[j])-
+                              CalculateDistanceTwoNodes(cities[i],cities[j]);
+            }
 
-       }
-   }
+        }
+    }
 
-   float maximum=0.0;
-   int indexi=-1;
-   int indexj=-1;
+    float maximum=0.0;
+    int indexi=-1;
+    int indexj=-1;
 
-   for(int i=1;i<=n;i++)
-   {
-       for(int j=1;j<=n;j++)
-       {
-           if(savings[i][j]>maximum)
-           {
-               maximum=savings[i][j];
-               indexi=i;
-               indexj=j;
-           }
+    for(int i=1; i<=n; i++)
+    {
+        for(int j=1; j<=n; j++)
+        {
+            if(savings[i][j]>maximum)
+            {
+                maximum=savings[i][j];
+                indexi=i;
+                indexj=j;
+            }
 
-       }
-   }
-
-   //cout<< indexi <<  " " << indexj << endl;
-
+        }
+    }
 
     dq.push_back(indexj);
     dq.push_front(indexi);
     visited[indexi]=true;
     visited[indexj]=true;
 
-
-
-/*
-    for(int i=0;i<dq.size();i++)
-    {
-        cout<< dq[i] << " ";
-    }
-*/
 
     int temp1,temp2,tempx,tempy;
 
@@ -285,7 +334,7 @@ void Savings(int startIndex)
         temp2=dq.back();
 
         float maximum=0.0;
-        for(int i=1;i<=n;i++)
+        for(int i=1; i<=n; i++)
         {
             if(visited[i]==false)
             {
@@ -299,7 +348,7 @@ void Savings(int startIndex)
 
 
         float maximum2=0.0;
-        for(int i=1;i<=n;i++)
+        for(int i=1; i<=n; i++)
         {
             if(visited[i]==false)
             {
@@ -314,43 +363,184 @@ void Savings(int startIndex)
 
         if(tempx!=tempy)
         {
-           visited[tempx]=true;
-           visited[tempy]=true;
+            visited[tempx]=true;
+            visited[tempy]=true;
 
-           dq.push_front(tempx);
-           dq.push_back(tempy);
+            dq.push_front(tempx);
+            dq.push_back(tempy);
 
         }
         else
         {
 
-           if(maximum>maximum2)
-           {
-               visited[tempx]=true;
-               dq.push_front(tempx);
-           }
-           else
-           {
-               visited[tempy]=true;
-               dq.push_front(tempy);
-           }
+            if(maximum>maximum2)
+            {
+                visited[tempx]=true;
+                dq.push_front(tempx);
+            }
+            else
+            {
+                visited[tempy]=true;
+                dq.push_back(tempy);
+            }
         }
 
     }
 
 
+    dq.push_front(startIndex);
+    dq.push_back(startIndex);
 
- dq.push_front(startIndex);
- dq.push_back(startIndex);
+    for(int i=0; i<dq.size(); i++)
+    {
+        path.push_back(dq[i]);
+    }
+
+}
+
+
+///Randomized savings Heuristic Implementation
+
+void SavingsRandomized(int startIndex)
+{
+    path.clear();
+    memset(visited,0,sizeof(visited));
+
+    deque<int> dq;
+
+    vector<pair<float,int>>v1;
+    vector<pair<float,int>>v2;
+
+    visited[startIndex]=true;
+
+    float savings[n+1][n+1];
+    memset(savings,0,sizeof(savings));
+
+    for(int i=1; i<=n; i++)
+    {
+        for(int j=i+1; j<=n; j++)
+        {
+            if(i!= startIndex && j!= startIndex)
+            {
+                savings[i][j]=CalculateDistanceTwoNodes(cities[startIndex],cities[i])+
+                              CalculateDistanceTwoNodes(cities[startIndex],cities[j])-
+                              CalculateDistanceTwoNodes(cities[i],cities[j]);
+
+                savings[j][i]=CalculateDistanceTwoNodes(cities[startIndex],cities[i])+
+                              CalculateDistanceTwoNodes(cities[startIndex],cities[j])-
+                              CalculateDistanceTwoNodes(cities[i],cities[j]);
+            }
+
+        }
+    }
+
+    float maximum=0.0;
+    int indexi=-1;
+    int indexj=-1;
+
+    for(int i=1; i<=n; i++)
+    {
+        for(int j=1; j<=n; j++)
+        {
+            if(savings[i][j]>maximum)
+            {
+                maximum=savings[i][j];
+                indexi=i;
+                indexj=j;
+            }
+
+        }
+    }
+
+    dq.push_back(indexj);
+    dq.push_front(indexi);
+    visited[indexi]=true;
+    visited[indexj]=true;
+
+
+    int temp1,temp2,tempx,tempy;
+
+    while(dq.size()< (n-1))
+    {
+        tempx=-1;
+        tempy=-1;
+        temp1=dq.front();
+        temp2=dq.back();
+
+        for(int i=1; i<=n; i++)
+        {
+            if(visited[i]==false)
+            {
+                v1.push_back({savings[temp1][i],i});
+            }
+        }
+
+
+        for(int i=1; i<=n; i++)
+        {
+            if(visited[i]==false)
+            {
+                v2.push_back({savings[temp2][i],i});
+            }
+        }
+
+
+        sort(v1.begin(),v1.end());
+        sort(v2.begin(),v2.end());
+
+        int k1=5;
+        int k2=5;
+
+        if(k1>=v1.size())
+            k1=v1.size();
+
+        if(k2>=v2.size())
+            k2=v2.size();
+
+        int tempindex1=rand()%k1;
+        int tempindex2=rand()%k2;
 
 
 
 
+        if(v1[tempindex1].second!=v2[tempindex2].second)
+        {
+            visited[v1[tempindex1].second]=true;
+            visited[v2[tempindex2].second]=true;
 
- for(int i=0;i<dq.size();i++)
- {
-     path.push_back(dq[i]);
- }
+            dq.push_front(v1[tempindex1].second);
+            dq.push_back(v2[tempindex2].second);
+
+        }
+
+        else
+        {
+            if(v1[tempindex1].first > v2[tempindex2].first)
+            {
+                visited[v1[tempindex1].second]=true;
+                dq.push_front(v1[tempindex1].second);
+            }
+            else
+            {
+                visited[v2[tempindex2].second]=true;
+                dq.push_front(v2[tempindex2].second);
+            }
+        }
+
+        v1.clear();
+        v2.clear();
+
+    }
+
+    dq.push_front(startIndex);
+    dq.push_back(startIndex);
+
+
+
+    for(int i=0; i<dq.size(); i++)
+    {
+        path.push_back(dq[i]);
+    }
 
 }
 
@@ -429,12 +619,17 @@ void CheapestInsertion(int startindex)
 
 ///2-opt Heuristic implementation
 
-void TwoOpt(int startindex)
+void TwoOpt(vector<int>path2)
 {
     path.clear();
     memset(visited,0,sizeof(visited));
 
-    NearestNeighbour(startindex);
+    //NearestNeighbour(startindex);
+
+    for(int i=0; i<path2.size(); i++)
+    {
+        path.push_back(path2[i]);
+    }
 
     float best=CalculateCost();
     float temp_cost;
@@ -444,9 +639,9 @@ void TwoOpt(int startindex)
     while(true)
     {
         flag=false;
-        for(int i=1;i<path.size()-2;i++)
+        for(int i=1; i<path.size()-2; i++)
         {
-            for(int k=i+1;k<path.size()-1;k++)
+            for(int k=i+1; k<path.size()-1; k++)
             {
                 reverse(path.begin()+i,path.begin()+k+1);
                 temp_cost=CalculateCost();
@@ -474,20 +669,316 @@ void TwoOpt(int startindex)
 
 int main()
 {
+    freopen("burma14.tsp", "r", stdin);
+    //freopen("berlin52.tsp", "r", stdin);
+    //freopen("st70.tsp", "r", stdin);
 
+    cin>> n;
+
+    int idx;
+    float x;
+    float y;
+    for(int i=1; i<=n; i++)
+    {
+        cin>>idx>>x>>y;
+        cities[idx].x=x;
+        cities[idx].y=y;
+    }
+
+
+    ///task 1
+
+    ///calculation for nearest neighbour
+
+    int nearestneighbourstrt[5];
+    float nearestneighbourcosts[5];
+    int k;
+    float cost;
+
+    vector<pair<float,vector<int>>> rtemp;
+
+    for(int i=0; i<5; i++)
+    {
+        k= rand()%n;
+
+        if(k==0)
+        {
+            k=n;
+        }
+
+
+        nearestneighbourstrt[i]=k;
+
+        NearestNeighbour(k);
+
+        nearestneighbourcosts[i]=CalculateCost();
+
+        rtemp.push_back({CalculateCost(),path});
+
+
+    }
+
+
+    /*for(int i=0;i<5;i++)
+    {
+        cout<< nearestneighbourstrt[i] << "-> " << nearestneighbourcosts[i] << endl;
+    }*/
+
+    float best=inf;
+    float worst=0;
+    int bestcoststrtnode;
+
+    for(int i=0; i<5; i++)
+    {
+        if(nearestneighbourcosts[i]<best)
+        {
+            best=nearestneighbourcosts[i];
+            bestcoststrtnode=nearestneighbourstrt[i];
+        }
+        if(nearestneighbourcosts[i]>worst)
+        {
+            worst=nearestneighbourcosts[i];
+        }
+    }
+
+
+    cout<< "*****Nearest Neighbour Heuristic*****"<< endl ;
+    cout<< "Best case: " << best << endl;
+    cout<< "Worst case: "<< worst << endl;
+    cout<< endl << endl;
+
+    sort(rtemp.begin(),rtemp.end());
+
+    ///calculation for Savings Heuristic
+
+    int savingsstrt[5];
+    float savingscosts[5];
+
+    vector<pair<float,vector<int>>> rtemp2;
+
+
+    for(int i=0; i<5; i++)
+    {
+        k= rand()%n;
+
+        if(k==0)
+        {
+            k=n;
+        }
+
+
+        savingsstrt[i]=k;
+
+        Savings(k);
+
+        savingscosts[i]=CalculateCost();
+
+        rtemp2.push_back({CalculateCost(),path});
+
+
+    }
+
+
+    /*for(int i=0;i<5;i++)
+    {
+        cout<< savingsstrt[i] << "-> " << savingscosts[i] << endl;
+    }*/
+
+    best=inf;
+    worst=0;
+    int bestcoststrtnode2;
+
+    for(int i=0; i<5; i++)
+    {
+        if(savingscosts[i]<best)
+        {
+            best=savingscosts[i];
+            bestcoststrtnode2=savingsstrt[i];
+        }
+        if(savingscosts[i]>worst)
+        {
+            worst=savingscosts[i];
+        }
+    }
+
+
+    cout<< "*****Savings Heuristic*****"<< endl ;
+    cout<< "Best case: " << best << endl;
+    cout<< "Worst case: "<< worst << endl;
+    cout<< endl << endl;
+
+    sort(rtemp2.begin(),rtemp2.end());
+
+
+
+
+    ///task 2
+
+    ///Randomized Nearest Neighbour
+
+    float randnearestneighbourcosts[10];
+
+    for(int i=0; i<10; i++)
+    {
+
+        NearestNeighbourRandomized(bestcoststrtnode);
+
+        randnearestneighbourcosts[i]=CalculateCost();
+
+    }
+
+
+    /*for(int i=0;i<10;i++)
+    {
+        cout<< randnearestneighbourcosts[i] << endl;
+    }*/
+
+    best=inf;
+    worst=0;
+
+    for(int i=0; i<10; i++)
+    {
+        if(randnearestneighbourcosts[i]<best)
+        {
+            best=randnearestneighbourcosts[i];
+
+        }
+        if(randnearestneighbourcosts[i]>worst)
+        {
+            worst=randnearestneighbourcosts[i];
+        }
+    }
+
+
+    cout<< "*****Random Nearest Neighbour Heuristic*****"<< endl ;
+    cout<< "Best case: " << best << endl;
+    cout<< "Worst case: "<< worst << endl;
+    cout<< endl << endl;
+
+
+
+
+/// Randomized Savings
+
+    float randsavingscosts[10];
+
+
+    for(int i=0; i<10; i++)
+    {
+
+        SavingsRandomized(bestcoststrtnode2);
+
+        randsavingscosts[i]=CalculateCost();
+    }
+
+
+    /*for(int i=0;i<10;i++)
+    {
+        cout<< randsavingscosts[i] << endl;
+    }*/
+
+    best=inf;
+    worst=0;
+
+    for(int i=0; i<10; i++)
+    {
+        if(randsavingscosts[i]<best)
+        {
+            best=randsavingscosts[i];
+
+        }
+        if(randsavingscosts[i]>worst)
+        {
+            worst=randsavingscosts[i];
+        }
+    }
+
+
+    cout<< "*****Random Savings Heuristic*****"<< endl ;
+    cout<< "Best case: " << best << endl;
+    cout<< "Worst case: "<< worst << endl;
+    cout<< endl << endl;
+
+
+
+
+    ///task 3
+    ///Running the 2-OPT heuristic
+
+    ///2opt for Nearest Neighbour
+
+    float nnhopt[3];
+
+    for(int i=0;i<3;i++)
+    {
+
+     TwoOpt(rtemp[i].second);
+
+     nnhopt[i]=CalculateCost();
+
+    }
+
+
+    best=inf;
+    worst=0;
+
+    for(int i=0; i<3; i++)
+    {
+        if(nnhopt[i]<best)
+        {
+            best=nnhopt[i];
+
+        }
+        if(nnhopt[i]>worst)
+        {
+            worst=nnhopt[i];
+        }
+    }
+
+
+    cout<< "*****2-OPT Heuristic on NNH*****"<< endl ;
+    cout<< "Best case: " << best << endl;
+    cout<< "Worst case: "<< worst << endl;
+    cout<< endl << endl;
+
+
+
+    ///2opt for Savings
+
+    float sopt[3];
+
+    for(int i=0;i<3;i++)
+    {
+
+     TwoOpt(rtemp2[i].second);
+
+     sopt[i]=CalculateCost();
+
+    }
+
+
+    best=inf;
+    worst=0;
+
+    for(int i=0; i<3; i++)
+    {
+        if(sopt[i]<best)
+        {
+            best=sopt[i];
+
+        }
+        if(sopt[i]>worst)
+        {
+            worst=sopt[i];
+        }
+    }
+
+
+    cout<< "*****2-OPT Heuristic on SH*****"<< endl ;
+    cout<< "Best case: " << best << endl;
+    cout<< "Worst case: "<< worst << endl;
+    cout<< endl << endl;
 
     return 0;
 }
-/*
-10
-1 2
-5 3
-4 5
-2 7
-3 9
-8 3
-1 9
-5 8
-6 7
-9 2
-*/
+
