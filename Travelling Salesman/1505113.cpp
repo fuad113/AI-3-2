@@ -1,5 +1,6 @@
 #include <bits/stdc++.h>
 #define maxcity 100
+#define inf 9999999
 
 
 using namespace std;
@@ -7,13 +8,13 @@ using namespace std;
 
 struct City
 {
-    int x,y;
+    float x,y;
 
     City()
     {
 
     }
-    City (int x1, int y1)
+    City (float x1, float y1)
     {
         x=x1;
         y=y1;
@@ -26,22 +27,21 @@ City cities[maxcity];
 bool visited[maxcity];
 vector<int> path;
 
-int CalculateDistanceTwoNodes(City f,City s)
+float CalculateDistanceTwoNodes(City f,City s)
 {
-    int tempx= f.x - s.x ;
-    int tempy= f.y - s.y ;
+    float tempx= f.x - s.x ;
+    float tempy= f.y - s.y ;
 
-    int ret = tempx*tempx+tempy*tempy ;
+    float ret = tempx*tempx+tempy*tempy ;
     return ret;
-
 }
 
 int FindClosestUnvisitedNode(int node)
 {
-    int mindistance=100000;
+    float mindistance=100000;
     int index=-1;
 
-    for(int i=0; i<n; i++)
+    for(int i=1; i<=n; i++)
     {
         if(visited[i]==true)
             continue;
@@ -61,11 +61,11 @@ int FindClosestUnvisitedNode(int node)
 
 int FindNearestTotalGraph()
 {
-    int mindistance=100000;
+    float mindistance=100000;
     int index=-1;
     int temp;
 
-    for(int i=0; i<n; i++)
+    for(int i=1; i<=n; i++)
     {
         if(visited[i]== false)
             continue;
@@ -87,13 +87,13 @@ int FindNearestTotalGraph()
 ///calculate minimized Cir+Crj-Cij for Nearest Insertion
 int FindMinimizedEdge(int r)
 {
-    int mindistance=10000000.00;
+    float mindistance=10000000.00;
     int index=-1;
 
     int s=path.size();
 
     int i,j;
-    double temp;
+    float temp;
 
     for(int k=0; k<s; k++)
     {
@@ -116,7 +116,7 @@ int FindMinimizedEdge(int r)
 ///calculate minimized Cir+Crj-Cij for Cheapest Insertion
 int FindMinimizedEdge2()
 {
-    int mindistance=10000000.00;
+    float mindistance=10000000.00;
     int index=-1;
 
     int s=path.size();
@@ -173,7 +173,7 @@ float CalculateCost()
 
     for(int i=0; i<path.size()-1; i++)
     {
-        int temp=CalculateDistanceTwoNodes(cities[path[i]],cities[path[i+1]]);
+        float temp=CalculateDistanceTwoNodes(cities[path[i]],cities[path[i+1]]);
 
         ans+= sqrt(temp*1.0);
     }
@@ -207,6 +207,154 @@ void NearestNeighbour(int startnodeindex)
     path.push_back(startnodeindex);
 
 }
+
+///savings Heuristic Implementation
+
+void Savings(int startIndex)
+{
+   path.clear();
+   memset(visited,0,sizeof(visited));
+
+   deque<int> dq;
+
+   visited[startIndex]=true;
+
+   float savings[n+1][n+1];
+   memset(savings,0,sizeof(savings));
+
+   for(int i=1;i<=n;i++)
+   {
+       for(int j=i+1;j<=n;j++)
+       {
+           if(i!= startIndex && j!= startIndex)
+           {
+           savings[i][j]=CalculateDistanceTwoNodes(cities[startIndex],cities[i])+
+           CalculateDistanceTwoNodes(cities[startIndex],cities[j])-
+           CalculateDistanceTwoNodes(cities[i],cities[j]);
+
+           savings[j][i]=CalculateDistanceTwoNodes(cities[startIndex],cities[i])+
+           CalculateDistanceTwoNodes(cities[startIndex],cities[j])-
+           CalculateDistanceTwoNodes(cities[i],cities[j]);
+           }
+
+       }
+   }
+
+   float maximum=0.0;
+   int indexi=-1;
+   int indexj=-1;
+
+   for(int i=1;i<=n;i++)
+   {
+       for(int j=1;j<=n;j++)
+       {
+           if(savings[i][j]>maximum)
+           {
+               maximum=savings[i][j];
+               indexi=i;
+               indexj=j;
+           }
+
+       }
+   }
+
+   //cout<< indexi <<  " " << indexj << endl;
+
+
+    dq.push_back(indexj);
+    dq.push_front(indexi);
+    visited[indexi]=true;
+    visited[indexj]=true;
+
+
+
+/*
+    for(int i=0;i<dq.size();i++)
+    {
+        cout<< dq[i] << " ";
+    }
+*/
+
+    int temp1,temp2,tempx,tempy;
+
+    while(dq.size()< (n-1))
+    {
+        tempx=-1;
+        tempy=-1;
+        temp1=dq.front();
+        temp2=dq.back();
+
+        float maximum=0.0;
+        for(int i=1;i<=n;i++)
+        {
+            if(visited[i]==false)
+            {
+                if(savings[temp1][i]>maximum)
+                {
+                    maximum=savings[temp1][i];
+                    tempx=i;
+                }
+            }
+        }
+
+
+        float maximum2=0.0;
+        for(int i=1;i<=n;i++)
+        {
+            if(visited[i]==false)
+            {
+                if(savings[temp2][i]>maximum2)
+                {
+                    maximum2=savings[temp2][i];
+                    tempy=i;
+                }
+            }
+        }
+
+
+        if(tempx!=tempy)
+        {
+           visited[tempx]=true;
+           visited[tempy]=true;
+
+           dq.push_front(tempx);
+           dq.push_back(tempy);
+
+        }
+        else
+        {
+
+           if(maximum>maximum2)
+           {
+               visited[tempx]=true;
+               dq.push_front(tempx);
+           }
+           else
+           {
+               visited[tempy]=true;
+               dq.push_front(tempy);
+           }
+        }
+
+    }
+
+
+
+ dq.push_front(startIndex);
+ dq.push_back(startIndex);
+
+
+
+
+
+ for(int i=0;i<dq.size();i++)
+ {
+     path.push_back(dq[i]);
+ }
+
+}
+
+
 
 ///Nearest Insertion Heuristic Implementation
 
@@ -322,39 +470,10 @@ void TwoOpt(int startindex)
 
 }
 
-///3-opt Heuristic implementation
 
 
 int main()
 {
-    cin>> n;
-
-    for(int i=0; i<n; i++)
-    {
-        cin>> cities[i].x >> cities[i].y ;
-    }
-
-
-    int startnode=0;
-
-    cout<< "Start Node is at index : " << startnode << endl;
-
-   /* NearestNeighbour(startnode);
-    PrintPath();
-    cout<< "cost : " << CalculateCost() << endl;
-
-    NearestInsertion(startnode);
-    PrintPath();
-    cout<< "cost : " << CalculateCost() << endl;
-
-    CheapestInsertion(startnode);
-    PrintPath();
-    cout<< "cost : " << CalculateCost() << endl;*/
-
-    TwoOpt(startnode);
-    PrintPath();
-    cout<< "cost : " << CalculateCost() << endl;
-
 
 
     return 0;
