@@ -636,6 +636,7 @@ void TwoOpt(vector<int>path2)
     bool flag;
 
 
+
     while(true)
     {
         flag=false;
@@ -660,6 +661,62 @@ void TwoOpt(vector<int>path2)
 
         if(flag==false)
             break;
+
+    }
+
+}
+
+
+///2-opt Heuristic implementation
+
+void TwoOptfirst(vector<int>path2)
+{
+    path.clear();
+    memset(visited,0,sizeof(visited));
+
+    //NearestNeighbour(startindex);
+
+    for(int i=0; i<path2.size(); i++)
+    {
+        path.push_back(path2[i]);
+    }
+
+    float best=CalculateCost();
+    float best2=CalculateCost();
+    float temp_cost;
+    bool flag;
+
+
+    while(true)
+    {
+        flag=false;
+        for(int i=1; i<path.size()-2; i++)
+        {
+            for(int k=i+1; k<path.size()-1; k++)
+            {
+                reverse(path.begin()+i,path.begin()+k+1);
+                temp_cost=CalculateCost();
+
+                if(temp_cost < best)
+                {
+                    best=temp_cost;
+                    flag=true;
+                    break;
+                }
+                reverse(path.begin()+i,path.begin()+k+1);
+            }
+            if(flag==true)
+                break;
+        }
+
+        if(flag==false)
+            break;
+
+
+        if(best2!=best)
+        {
+            break;
+        }
 
     }
 
@@ -903,7 +960,7 @@ int main()
 
 
     ///task 3
-    ///Running the 2-OPT heuristic
+    ///Running the 2-OPT heuristic(best)
 
     ///2opt for Nearest Neighbour
 
@@ -936,7 +993,7 @@ int main()
     }
 
 
-    cout<< "*****2-OPT Heuristic on NNH*****"<< endl ;
+    cout<< "*****2-OPT(Best) Heuristic on NNH*****"<< endl ;
     cout<< "Best case: " << best << endl;
     cout<< "Worst case: "<< worst << endl;
     cout<< endl << endl;
@@ -974,11 +1031,90 @@ int main()
     }
 
 
-    cout<< "*****2-OPT Heuristic on SH*****"<< endl ;
+    cout<< "*****2-OPT(Best) Heuristic on SH*****"<< endl ;
     cout<< "Best case: " << best << endl;
     cout<< "Worst case: "<< worst << endl;
     cout<< endl << endl;
 
+
+
+
+    ///Running the 2-OPT heuristic(first)
+
+    ///2opt(first) for Nearest Neighbour
+
+    float nnhfopt[3];
+
+    for(int i=0;i<3;i++)
+    {
+
+     TwoOptfirst(rtemp[i].second);
+
+     nnhfopt[i]=CalculateCost();
+
+    }
+
+
+    best=inf;
+    worst=0;
+
+    for(int i=0; i<3; i++)
+    {
+        if(nnhfopt[i]<best)
+        {
+            best=nnhfopt[i];
+
+        }
+        if(nnhfopt[i]>worst)
+        {
+            worst=nnhfopt[i];
+        }
+    }
+
+
+    cout<< "*****2-OPT(First) Heuristic on NNH*****"<< endl ;
+    cout<< "Best case: " << best << endl;
+    cout<< "Worst case: "<< worst << endl;
+    cout<< endl << endl;
+
+
+
+    ///2opt(first) for Savings
+
+    float soptf[3];
+
+    for(int i=0;i<3;i++)
+    {
+
+     TwoOptfirst(rtemp2[i].second);
+
+     soptf[i]=CalculateCost();
+
+    }
+
+
+    best=inf;
+    worst=0;
+
+    for(int i=0; i<3; i++)
+    {
+        if(soptf[i]<best)
+        {
+            best=soptf[i];
+
+        }
+        if(soptf[i]>worst)
+        {
+            worst=soptf[i];
+        }
+    }
+
+
+    cout<< "*****2-OPT(First) Heuristic on SH*****"<< endl ;
+    cout<< "Best case: " << best << endl;
+    cout<< "Worst case: "<< worst << endl;
+    cout<< endl << endl;
+
+
     return 0;
 }
-
