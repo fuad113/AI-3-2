@@ -38,7 +38,7 @@ float CalculateDistanceTwoNodes(City f,City s)
 
 int FindClosestUnvisitedNode(int node)
 {
-    float mindistance=100000;
+    float mindistance=100000000.00;
     int index=-1;
 
     for(int i=1; i<=n; i++)
@@ -60,7 +60,7 @@ int FindClosestUnvisitedNode(int node)
 
 int FindClosestUnvisitedNodeRandomly(int node)
 {
-    float mindistance=100000;
+    float mindistance=100000000.00;
     int index=-1;
     vector<pair<float,int>> v;
 
@@ -96,7 +96,7 @@ int FindClosestUnvisitedNodeRandomly(int node)
 
 int FindNearestTotalGraph()
 {
-    float mindistance=100000;
+    float mindistance=100000000.00;
     int index=-1;
     int temp;
 
@@ -122,7 +122,7 @@ int FindNearestTotalGraph()
 ///calculate minimized Cir+Crj-Cij for Nearest Insertion
 int FindMinimizedEdge(int r)
 {
-    float mindistance=10000000.00;
+    float mindistance=100000000.00;
     int index=-1;
 
     int s=path.size();
@@ -705,18 +705,12 @@ void TwoOptfirst(vector<int>path2)
                 }
                 reverse(path.begin()+i,path.begin()+k+1);
             }
-            if(flag==true)
+            if(flag==true || best2!= best)
                 break;
         }
 
         if(flag==false)
             break;
-
-
-        if(best2!=best)
-        {
-            break;
-        }
 
     }
 
@@ -726,9 +720,9 @@ void TwoOptfirst(vector<int>path2)
 
 int main()
 {
-    freopen("burma14.tsp", "r", stdin);
+    //freopen("burma14.tsp", "r", stdin);
     //freopen("berlin52.tsp", "r", stdin);
-    //freopen("st70.tsp", "r", stdin);
+    freopen("st70.tsp", "r", stdin);
 
     cin>> n;
 
@@ -752,8 +746,6 @@ int main()
     int k;
     float cost;
 
-    vector<pair<float,vector<int>>> rtemp;
-
     for(int i=0; i<5; i++)
     {
         k= rand()%n;
@@ -769,9 +761,6 @@ int main()
         NearestNeighbour(k);
 
         nearestneighbourcosts[i]=CalculateCost();
-
-        rtemp.push_back({CalculateCost(),path});
-
 
     }
 
@@ -804,15 +793,11 @@ int main()
     cout<< "Worst case: "<< worst << endl;
     cout<< endl << endl;
 
-    sort(rtemp.begin(),rtemp.end());
 
     ///calculation for Savings Heuristic
 
     int savingsstrt[5];
     float savingscosts[5];
-
-    vector<pair<float,vector<int>>> rtemp2;
-
 
     for(int i=0; i<5; i++)
     {
@@ -830,13 +815,10 @@ int main()
 
         savingscosts[i]=CalculateCost();
 
-        rtemp2.push_back({CalculateCost(),path});
-
-
     }
 
-
-    /*for(int i=0;i<5;i++)
+   /*
+    for(int i=0;i<5;i++)
     {
         cout<< savingsstrt[i] << "-> " << savingscosts[i] << endl;
     }*/
@@ -864,9 +846,6 @@ int main()
     cout<< "Worst case: "<< worst << endl;
     cout<< endl << endl;
 
-    sort(rtemp2.begin(),rtemp2.end());
-
-
 
 
     ///task 2
@@ -874,6 +853,7 @@ int main()
     ///Randomized Nearest Neighbour
 
     float randnearestneighbourcosts[10];
+    vector<pair<float,vector<int>>> rtemp;
 
     for(int i=0; i<10; i++)
     {
@@ -882,10 +862,13 @@ int main()
 
         randnearestneighbourcosts[i]=CalculateCost();
 
+        rtemp.push_back({CalculateCost(),path});
+
+
     }
-
-
-    /*for(int i=0;i<10;i++)
+    /*
+    cout<< "Starting Index:" << bestcoststrtnode <<  endl;
+    for(int i=0;i<10;i++)
     {
         cout<< randnearestneighbourcosts[i] << endl;
     }*/
@@ -912,12 +895,14 @@ int main()
     cout<< "Worst case: "<< worst << endl;
     cout<< endl << endl;
 
-
+    sort(rtemp.begin(),rtemp.end());
 
 
 /// Randomized Savings
 
     float randsavingscosts[10];
+
+    vector<pair<float,vector<int>>> rtemp2;
 
 
     for(int i=0; i<10; i++)
@@ -926,10 +911,14 @@ int main()
         SavingsRandomized(bestcoststrtnode2);
 
         randsavingscosts[i]=CalculateCost();
+
+        rtemp2.push_back({CalculateCost(),path});
+
     }
 
-
-    /*for(int i=0;i<10;i++)
+    /*
+    cout<< "Starting Index:" << bestcoststrtnode2 <<  endl;
+    for(int i=0;i<10;i++)
     {
         cout<< randsavingscosts[i] << endl;
     }*/
@@ -956,7 +945,7 @@ int main()
     cout<< "Worst case: "<< worst << endl;
     cout<< endl << endl;
 
-
+    sort(rtemp2.begin(),rtemp2.end());
 
 
     ///task 3
