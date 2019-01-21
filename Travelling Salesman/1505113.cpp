@@ -495,7 +495,6 @@ void TwoOptbest(vector<int>path2)
     bool flag;
 
 
-
     while(true)
     {
         flag=false;

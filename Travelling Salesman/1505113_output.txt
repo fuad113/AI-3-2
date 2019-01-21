@@ -1,0 +1,77 @@
+------------------------
+          pr76          
+------------------------
+
+
+*****Nearest Neighbour Heuristic*****
+Avg. case: 149100
+Best case: 142174
+Worst case: 154235
+
+
+*****Savings Heuristic*****
+Avg. case: 121320
+Best case: 115704
+Worst case: 125468
+
+
+*****Random Nearest Neighbour Heuristic*****
+Avg. case: 187049
+Best case: 171705
+Worst case: 206084
+
+
+*****Random Savings Heuristic*****
+Avg. case: 633695
+Best case: 621453
+Worst case: 644980
+
+
+*****2-OPT(Best) Heuristic on NNH*****
+Avg. case: 114538
+Best case: 111726
+Worst case: 116151
+
+
+*****2-OPT(Best) Heuristic on SH*****
+Avg. case: 115366
+Best case: 112782
+Worst case: 117741
+
+
+*****2-OPT(First) Heuristic on NNH*****
+Avg. case: 112415
+Best case: 110756
+Worst case: 114813
+
+
+*****2-OPT(First) Heuristic on SH*****
+Avg. case: 111261
+Best case: 110345
+Worst case: 113040
+
+
+-------Performance Comparison-------
+
+Best Improvement
+----------------
+
+            NNH                        SH      
+           -----                      ----
+Actual Cost      Percentage       Actual Cost      Percentage
+-----------      ----------       -----------      ----------
+111726          103.298          112782          104.275
+
+
+First Improvement
+----------------
+
+            NNH                        SH      
+           -----                      ----
+Actual Cost      Percentage       Actual Cost      Percentage
+-----------      ----------       -----------      ----------
+110756          102.402          110345          102.021
+
+
+
+
