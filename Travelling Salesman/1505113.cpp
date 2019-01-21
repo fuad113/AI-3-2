@@ -32,7 +32,9 @@ float CalculateDistanceTwoNodes(City f,City s)
     float tempx= f.x - s.x ;
     float tempy= f.y - s.y ;
 
-    float ret = tempx*tempx+tempy*tempy ;
+    float ret1 = tempx*tempx+tempy*tempy ;
+    float ret= sqrt(ret1*1.0);
+
     return ret;
 }
 
@@ -118,77 +120,6 @@ int FindNearestTotalGraph()
     return index;
 }
 
-
-///calculate minimized Cir+Crj-Cij for Nearest Insertion
-int FindMinimizedEdge(int r)
-{
-    float mindistance=100000000.00;
-    int index=-1;
-
-    int s=path.size();
-
-    int i,j;
-    float temp;
-
-    for(int k=0; k<s; k++)
-    {
-        i=path[k];
-        j=path[(k+1)%s];
-        temp=CalculateDistanceTwoNodes(cities[i],cities[r])+CalculateDistanceTwoNodes(cities[r],cities[j])- CalculateDistanceTwoNodes(cities[i],cities[j]);
-
-        if(temp < mindistance)
-        {
-            mindistance=temp;
-            index=i;
-        }
-
-    }
-
-    return index;
-
-}
-
-///calculate minimized Cir+Crj-Cij for Cheapest Insertion
-int FindMinimizedEdge2()
-{
-    float mindistance=10000000.00;
-    int index=-1;
-
-    int s=path.size();
-
-    int i,j,city;
-    double temp;
-
-    for(int k=0; k<s; k++)
-    {
-        i=path[k];
-        j=path[(k+1)%s];
-
-        for(int r=0; r<n; r++)
-        {
-
-            if(visited[r]==true)
-                continue;
-
-            temp=CalculateDistanceTwoNodes(cities[i],cities[r])+CalculateDistanceTwoNodes(cities[r],cities[j])- CalculateDistanceTwoNodes(cities[i],cities[j]);
-
-            if(temp < mindistance)
-            {
-                mindistance=temp;
-                index=i;
-                city=r;
-            }
-
-        }
-
-    }
-
-    visited[city]=true;
-    path.push_back(city);
-    return index;
-
-}
-
 void PrintPath()
 {
     for(int i=0; i<path.size(); i++)
@@ -210,7 +141,7 @@ float CalculateCost()
     {
         float temp=CalculateDistanceTwoNodes(cities[path[i]],cities[path[i+1]]);
 
-        ans+= sqrt(temp*1.0);
+        ans+= temp;
     }
 
     return ans;
@@ -545,81 +476,9 @@ void SavingsRandomized(int startIndex)
 }
 
 
+///2-opt (best) Heuristic implementation
 
-///Nearest Insertion Heuristic Implementation
-
-void NearestInsertion(int startindex)
-{
-    path.clear();
-    memset(visited,0,sizeof(visited));
-
-    visited[startindex]=true;
-    path.push_back(startindex);
-    int temp= FindClosestUnvisitedNode(startindex);
-    visited[temp]=true;
-    path.push_back(temp);
-
-
-    int r,s;
-
-    while(path.size() < n)
-    {
-        s=path.size();
-        r=FindNearestTotalGraph();
-        visited[r]=true;
-        temp=FindMinimizedEdge(r);
-
-        //adding r between i and j
-        path.push_back(r);
-        for(int i=s-1; i>=0; i--)
-        {
-            if(path[i]==temp)
-                break;
-            swap(path[i],path[i+1]);
-        }
-
-    }
-
-    path.push_back(startindex);
-
-
-}
-
-///Cheapest Insertion Heuristic Implementation
-
-void CheapestInsertion(int startindex)
-{
-    path.clear();
-    memset(visited,0,sizeof(visited));
-
-    visited[startindex]=true;
-    path.push_back(startindex);
-    int temp= FindClosestUnvisitedNode(startindex);
-    visited[temp]=true;
-    path.push_back(temp);
-
-    int s;
-    while(path.size() < n)
-    {
-        s=path.size();
-        temp=FindMinimizedEdge2();
-
-        for(int i=s-1; i>=0; i--)
-        {
-            if(path[i]==temp)
-                break;
-            swap(path[i],path[i+1]);
-        }
-
-    }
-
-    path.push_back(startindex);
-
-}
-
-///2-opt Heuristic implementation
-
-void TwoOpt(vector<int>path2)
+void TwoOptbest(vector<int>path2)
 {
     path.clear();
     memset(visited,0,sizeof(visited));
@@ -651,12 +510,13 @@ void TwoOpt(vector<int>path2)
                 {
                     best=temp_cost;
                     flag=true;
-                    break;
                 }
-                reverse(path.begin()+i,path.begin()+k+1);
+                else
+                {
+                    reverse(path.begin()+i,path.begin()+k+1);
+                }
             }
-            if(flag==true)
-                break;
+
         }
 
         if(flag==false)
@@ -667,7 +527,7 @@ void TwoOpt(vector<int>path2)
 }
 
 
-///2-opt Heuristic implementation
+///2-opt (first) Heuristic implementation
 
 void TwoOptfirst(vector<int>path2)
 {
@@ -682,7 +542,6 @@ void TwoOptfirst(vector<int>path2)
     }
 
     float best=CalculateCost();
-    float best2=CalculateCost();
     float temp_cost;
     bool flag;
 
@@ -703,9 +562,13 @@ void TwoOptfirst(vector<int>path2)
                     flag=true;
                     break;
                 }
-                reverse(path.begin()+i,path.begin()+k+1);
+                else
+                {
+                    reverse(path.begin()+i,path.begin()+k+1);
+                }
+
             }
-            if(flag==true || best2!= best)
+            if(flag==true)
                 break;
         }
 
@@ -720,13 +583,41 @@ void TwoOptfirst(vector<int>path2)
 
 int main()
 {
-    //freopen("burma14.tsp", "r", stdin);
+    freopen("pr76.tsp", "r", stdin);
     //freopen("berlin52.tsp", "r", stdin);
-    freopen("st70.tsp", "r", stdin);
+    //freopen("st70.tsp", "r", stdin);
+
+    freopen("1505113_output.txt", "a", stdout);
 
     cin>> n;
 
+    if(n==76)
+    {
+        cout<< "------------------------\n";
+        cout<< "          pr76          \n";
+        cout<< "------------------------\n\n\n";
+    }
+    else if(n==52)
+    {
+        cout<< "------------------------\n";
+        cout<< "          berlin52      \n";
+        cout<< "------------------------\n\n\n";
+    }
+
+    else if(n==70)
+    {
+        cout<< "------------------------\n";
+        cout<< "          st70          \n";
+        cout<< "------------------------\n\n\n";
+    }
+
+
     int idx;
+    float pc1,pc2,pc3,pc4;
+    float bestcostpr76=108159;
+    float bestcostberlin52=7542;
+    float bestcostst70=675;
+
     float x;
     float y;
     for(int i=1; i<=n; i++)
@@ -745,6 +636,7 @@ int main()
     float nearestneighbourcosts[5];
     int k;
     float cost;
+    vector<pair<float,vector<int>>> rtemp3;
 
     for(int i=0; i<5; i++)
     {
@@ -762,16 +654,13 @@ int main()
 
         nearestneighbourcosts[i]=CalculateCost();
 
+        rtemp3.push_back({CalculateCost(),path});
+
     }
-
-
-    /*for(int i=0;i<5;i++)
-    {
-        cout<< nearestneighbourstrt[i] << "-> " << nearestneighbourcosts[i] << endl;
-    }*/
 
     float best=inf;
     float worst=0;
+    float avg=0;
     int bestcoststrtnode;
 
     for(int i=0; i<5; i++)
@@ -785,19 +674,27 @@ int main()
         {
             worst=nearestneighbourcosts[i];
         }
+
+        avg+=nearestneighbourcosts[i];
     }
+
+    avg=(avg/5);
 
 
     cout<< "*****Nearest Neighbour Heuristic*****"<< endl ;
+    cout<< "Avg. case: " << avg << endl;
     cout<< "Best case: " << best << endl;
     cout<< "Worst case: "<< worst << endl;
     cout<< endl << endl;
+
+    sort(rtemp3.begin(),rtemp3.end());
 
 
     ///calculation for Savings Heuristic
 
     int savingsstrt[5];
     float savingscosts[5];
+    vector<pair<float,vector<int>>> rtemp4;
 
     for(int i=0; i<5; i++)
     {
@@ -815,16 +712,14 @@ int main()
 
         savingscosts[i]=CalculateCost();
 
+        rtemp4.push_back({CalculateCost(),path});
+
     }
 
-   /*
-    for(int i=0;i<5;i++)
-    {
-        cout<< savingsstrt[i] << "-> " << savingscosts[i] << endl;
-    }*/
 
     best=inf;
     worst=0;
+    avg=0;
     int bestcoststrtnode2;
 
     for(int i=0; i<5; i++)
@@ -838,14 +733,18 @@ int main()
         {
             worst=savingscosts[i];
         }
+        avg+=savingscosts[i];
     }
 
+    avg=(avg/5);
 
     cout<< "*****Savings Heuristic*****"<< endl ;
+    cout<< "Avg. case: " << avg << endl;
     cout<< "Best case: " << best << endl;
     cout<< "Worst case: "<< worst << endl;
     cout<< endl << endl;
 
+    sort(rtemp4.begin(),rtemp4.end());
 
 
     ///task 2
@@ -866,15 +765,10 @@ int main()
 
 
     }
-    /*
-    cout<< "Starting Index:" << bestcoststrtnode <<  endl;
-    for(int i=0;i<10;i++)
-    {
-        cout<< randnearestneighbourcosts[i] << endl;
-    }*/
 
     best=inf;
     worst=0;
+    avg=0;
 
     for(int i=0; i<10; i++)
     {
@@ -887,10 +781,13 @@ int main()
         {
             worst=randnearestneighbourcosts[i];
         }
+        avg+=randnearestneighbourcosts[i];
     }
 
+    avg=(avg/10);
 
     cout<< "*****Random Nearest Neighbour Heuristic*****"<< endl ;
+    cout<< "Avg. case: " << avg << endl;
     cout<< "Best case: " << best << endl;
     cout<< "Worst case: "<< worst << endl;
     cout<< endl << endl;
@@ -916,15 +813,10 @@ int main()
 
     }
 
-    /*
-    cout<< "Starting Index:" << bestcoststrtnode2 <<  endl;
-    for(int i=0;i<10;i++)
-    {
-        cout<< randsavingscosts[i] << endl;
-    }*/
 
     best=inf;
     worst=0;
+    avg=0;
 
     for(int i=0; i<10; i++)
     {
@@ -937,10 +829,14 @@ int main()
         {
             worst=randsavingscosts[i];
         }
+
+        avg+=randsavingscosts[i];
     }
 
+    avg=(avg/10);
 
     cout<< "*****Random Savings Heuristic*****"<< endl ;
+    cout<< "Avg. case: " << avg << endl;
     cout<< "Best case: " << best << endl;
     cout<< "Worst case: "<< worst << endl;
     cout<< endl << endl;
@@ -953,22 +849,25 @@ int main()
 
     ///2opt for Nearest Neighbour
 
-    float nnhopt[3];
+    float nnhopt[4];
 
     for(int i=0;i<3;i++)
     {
 
-     TwoOpt(rtemp[i].second);
+     TwoOptbest(rtemp[i].second);
 
      nnhopt[i]=CalculateCost();
 
     }
 
+    TwoOptbest(rtemp3[0].second);
+    nnhopt[3]=CalculateCost();
 
     best=inf;
+    avg=0;
     worst=0;
 
-    for(int i=0; i<3; i++)
+    for(int i=0; i<4; i++)
     {
         if(nnhopt[i]<best)
         {
@@ -979,34 +878,43 @@ int main()
         {
             worst=nnhopt[i];
         }
+        avg+=nnhopt[i];
     }
 
+    avg=(avg/4);
 
     cout<< "*****2-OPT(Best) Heuristic on NNH*****"<< endl ;
+    cout<< "Avg. case: " << avg << endl;
     cout<< "Best case: " << best << endl;
     cout<< "Worst case: "<< worst << endl;
     cout<< endl << endl;
+
+    pc1=best;
 
 
 
     ///2opt for Savings
 
-    float sopt[3];
+    float sopt[4];
 
     for(int i=0;i<3;i++)
     {
 
-     TwoOpt(rtemp2[i].second);
+     TwoOptbest(rtemp2[i].second);
 
      sopt[i]=CalculateCost();
 
     }
 
+    TwoOptbest(rtemp4[0].second);
+    sopt[3]=CalculateCost();
+
 
     best=inf;
+    avg=0;
     worst=0;
 
-    for(int i=0; i<3; i++)
+    for(int i=0; i<4; i++)
     {
         if(sopt[i]<best)
         {
@@ -1017,22 +925,25 @@ int main()
         {
             worst=sopt[i];
         }
+        avg+=sopt[i];
     }
 
+    avg= (avg/4);
 
     cout<< "*****2-OPT(Best) Heuristic on SH*****"<< endl ;
+    cout<< "Avg. case: " << avg << endl;
     cout<< "Best case: " << best << endl;
     cout<< "Worst case: "<< worst << endl;
     cout<< endl << endl;
 
-
+    pc2=best;
 
 
     ///Running the 2-OPT heuristic(first)
 
     ///2opt(first) for Nearest Neighbour
 
-    float nnhfopt[3];
+    float nnhfopt[4];
 
     for(int i=0;i<3;i++)
     {
@@ -1043,11 +954,14 @@ int main()
 
     }
 
+    TwoOptfirst(rtemp3[0].second);
+    nnhfopt[3]=CalculateCost();
 
     best=inf;
+    avg=0;
     worst=0;
 
-    for(int i=0; i<3; i++)
+    for(int i=0; i<4; i++)
     {
         if(nnhfopt[i]<best)
         {
@@ -1058,19 +972,24 @@ int main()
         {
             worst=nnhfopt[i];
         }
+        avg+=nnhfopt[i];
     }
 
+    avg=(avg/4);
 
     cout<< "*****2-OPT(First) Heuristic on NNH*****"<< endl ;
+    cout<< "Avg. case: " << avg << endl;
     cout<< "Best case: " << best << endl;
     cout<< "Worst case: "<< worst << endl;
     cout<< endl << endl;
+
+    pc3=best;
 
 
 
     ///2opt(first) for Savings
 
-    float soptf[3];
+    float soptf[4];
 
     for(int i=0;i<3;i++)
     {
@@ -1081,11 +1000,14 @@ int main()
 
     }
 
+    TwoOptfirst(rtemp4[0].second);
+    soptf[3]=CalculateCost();
 
     best=inf;
     worst=0;
+    avg=0;
 
-    for(int i=0; i<3; i++)
+    for(int i=0; i<4; i++)
     {
         if(soptf[i]<best)
         {
@@ -1096,14 +1018,58 @@ int main()
         {
             worst=soptf[i];
         }
+        avg+=soptf[i];
     }
 
+    avg=(avg/4);
 
     cout<< "*****2-OPT(First) Heuristic on SH*****"<< endl ;
+    cout<< "Avg. case: " << avg << endl;
     cout<< "Best case: " << best << endl;
     cout<< "Worst case: "<< worst << endl;
     cout<< endl << endl;
 
+    pc4=best;
+
+    ///performance comparison
+
+    float bc;
+    if(n==76)
+    {
+        bc=bestcostpr76;
+    }
+    else if(n==52)
+    {
+        bc=bestcostberlin52;
+    }
+    else if(n==70)
+    {
+        bc=bestcostst70;
+    }
+
+
+    cout<< "-------Performance Comparison-------\n\n";
+
+
+    cout<< "Best Improvement\n";
+    cout<< "----------------\n\n";
+    cout<< "            NNH                        SH      \n";
+    cout<< "           -----                      ----\n";
+    cout<< "Actual Cost      Percentage       Actual Cost      Percentage\n";
+    cout<< "-----------      ----------       -----------      ----------\n";
+    cout<< pc1 << "          " << (pc1/bc)*100 << "          " << pc2 << "          " << (pc2/bc)*100  <<endl ;
+
+    cout<< "\n\n";
+
+    cout<< "First Improvement\n";
+    cout<< "----------------\n\n";
+    cout<< "            NNH                        SH      \n";
+    cout<< "           -----                      ----\n";
+    cout<< "Actual Cost      Percentage       Actual Cost      Percentage\n";
+    cout<< "-----------      ----------       -----------      ----------\n";
+    cout<< pc3 << "          " << (pc3/bc)*100 << "          " << pc4 << "          " << (pc4/bc)*100  <<endl ;
+
+    cout<< "\n\n\n\n" ;
 
     return 0;
 }
