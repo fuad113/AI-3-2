@@ -5,11 +5,12 @@ using namespace std;
 
 class Board
 {
+
+public :
+
     int player1board[6];
     int player2board[6];
     int container[2];
-
-public :
 
     Board()
     {
@@ -238,6 +239,25 @@ public :
     }
 
 
+    int Whoiswinner()
+    {
+        if(container[0]> container[1])
+        {
+            return 1;
+        }
+        else if(container[0] < container[1])
+        {
+            return 2;
+        }
+        else
+        {
+            return 3;
+        }
+
+    }
+
+
+
     void PrintBoard()
     {
         for(int i=5; i>=0; i--)
@@ -264,24 +284,29 @@ public :
 class Player
 {
 
-    int heuristic,depth,playernum,w1,w2,w3,w4;
+    int heuristic,depth,playernum,w1,w2,w3,w4,otherplayer, addition,initialstorage;
     bool ishuman;
 
 public:
 
-    Player(int heuristic,bool ishuman,int playernum,int depth,int w1,int w2,int w3, int w4)
+    Player(int playernum,int heuristic,bool ishuman,int depth,int w1,int w2,int w3, int w4)
     {
-        this.heuristic=heuristic;
-        this.ishuman=ishuman;
-        this.depth=depth;
-        this.w1=w1;
-        this.w2=w2;
-        this.w3=w3;
-        this.w4=w4;
+        this->heuristic=heuristic;
+        this->ishuman=ishuman;
+        this->depth=depth;
+        this->w1=w1;
+        this->w2=w2;
+        this->w3=w3;
+        this->w4=w4;
+
+        if(playernum==1)
+            otherplayer=2;
+        else
+            otherplayer=1;
     }
 
 
-    int Getstartindex()
+    int Getstartindex(Board b)
     {
         int idx;
         if(ishuman==true)
@@ -293,7 +318,14 @@ public:
         }
         else
         {
-            idx=MinMax();
+            addition = 0;
+
+            if(playernum==1)
+                initialstorage=b.container[0];
+            else
+                initialstorage=b.container[1];
+
+            idx=MiniMaxalgo(b,depth,true,-1000000,1000000);
             return idx;
         }
 
@@ -302,6 +334,8 @@ public:
 
     int Evaluationfunction(Board temp)
     {
+        int x1=temp.container[0];
+        int x2=temp.container[1];
 
         if(heuristic==1)
         {
@@ -336,25 +370,219 @@ public:
             }
             else
             {
-               int storagedif= temp.container[1]-temp.container[0];
-               int h= (w1*storagedif) + (w2*(sum2-sum1)) ;
-               return h;
+                int storagedif= temp.container[1]-temp.container[0];
+                int h= (w1*storagedif) + (w2*(sum2-sum1)) ;
+                return h;
             }
 
         }
 
         else if(heuristic==3)
         {
+            int sum1,sum2;
 
+            for(int i=0; i<6; i++)
+            {
+                sum1+=temp.player1board[i];
+                sum2+=temp.player2board[i];
+            }
+
+
+           if(playernum==1)
+           {
+               int storagedif= temp.container[0]-temp.container[1];
+               int h= (w1*storagedif) + (w2*(sum1-sum2)) +w3*addition;
+               return h;
+
+           }
+
+           else
+           {
+               int storagedif= temp.container[1]-temp.container[0];
+               int h= (w1*storagedif) + (w2*(sum2-sum1)) + w3*addition ;
+               return h;
+
+           }
 
         }
+
+
         else if(heuristic==4)
         {
+
+           int sum1,sum2;
+
+            for(int i=0; i<6; i++)
+            {
+                sum1+=temp.player1board[i];
+                sum2+=temp.player2board[i];
+            }
+
+
+           if(playernum==1)
+           {
+               int storagedif= temp.container[0]-temp.container[1];
+
+               int h= (w1*storagedif) + (w2*(sum1-sum2)) +w3*addition + w4*(temp.container[0]-initialstorage);
+               return h;
+
+           }
+
+           else
+           {
+               int storagedif= temp.container[1]-temp.container[0];
+               int h= (w1*storagedif) + (w2*(sum2-sum1)) + w3*addition + w4*(temp.container[1]-initialstorage);
+               return h;
+
+           }
+
 
 
         }
 
     }
+
+
+    int MiniMaxalgo(Board b,int dep,bool isMaximizing,int alpha,int beta)
+    {
+
+        int bestval,value;
+        if(b.Endgame()==true)
+        {
+            if(b.Whoiswinner()==playernum)
+                return 1000000;
+            else if(b.Whoiswinner() ==otherplayer)
+                return -10000000;
+            else
+                return Evaluationfunction(b);
+        }
+
+        if(dep==0)
+            return Evaluationfunction(b);
+
+        Board temp;
+
+        for(int i=0; i<6; i++)
+        {
+            temp.player1board[i]=b.player1board[i];
+            temp.player2board[i]=b.player2board[i];
+        }
+
+        for(int i=0; i<2; i++)
+        {
+            temp.container[i]=b.container[i];
+        }
+
+
+
+        if(isMaximizing==true)
+        {
+            bestval=-1000000;
+
+            for(int i=0; i<6; i++)
+            {
+                if(playernum==1)
+                {
+                    if(b.player1board[i]==0)
+                        continue;
+                }
+                else if(playernum==2)
+                {
+                    if(b.player2board[i]==0)
+                        continue;
+                }
+
+                //update board
+                int x = b.UpdateBoard(playernum, i);
+
+                if(x==playernum)
+                {
+                    addition++;
+                    value=MiniMaxalgo(b,dep-1,true,alpha,beta);
+                    addition--;
+                }
+
+                else
+                    value=MiniMaxalgo(b,dep-1,false,alpha,beta);
+
+                bestval=max(bestval,value);
+                alpha=max(alpha,bestval);
+
+                //restore board
+                for(int i=0; i<6; i++)
+                {
+                    b.player1board[i]=temp.player1board[i];
+                    b.player2board[i]=temp.player2board[i];
+                }
+
+                for(int i=0; i<2; i++)
+                {
+                    b.container[i]=temp.container[i];
+                }
+
+
+
+                if(beta <= alpha)
+                    break;
+
+                return bestval;
+            }
+        }
+
+        else
+        {
+
+            bestval=+1000000;
+
+
+            for(int i=0; i<6; i++)
+            {
+                if(playernum==1)
+                {
+                    if(b.player2board[i]==0)
+                        continue;
+                }
+                else if(playernum==2)
+                {
+                    if(b.player1board[i]==0)
+                        continue;
+                }
+
+                //update board
+                int x = b.UpdateBoard(otherplayer, i);
+
+
+                if(x==otherplayer)
+                    value=MiniMaxalgo(b,dep-1,false,alpha,beta);
+                else
+                    value = MiniMaxalgo(b,dep-1,true,alpha,beta);
+
+                bestval=min(bestval,value);
+                beta=min(beta,bestval);
+
+                //restore board
+                for(int i=0; i<6; i++)
+                {
+                    b.player1board[i]=temp.player1board[i];
+                    b.player2board[i]=temp.player2board[i];
+                }
+
+                for(int i=0; i<2; i++)
+                {
+                    b.container[i]=temp.container[i];
+                }
+
+
+                if(beta <= alpha)
+                    break;
+                return bestval;
+            }
+
+
+        }
+
+    }
+
 
 
 
@@ -365,22 +593,25 @@ public:
 
 
 
-
-
 int main()
 {
 
+    int w1=100;
+    int w2=50;
+    int w3=0;
+    int w4=0;
+
+    Player p1=Player(1,1,false,9,w1,w2,w3,w4);
+    Player p2=Player(1,1,false,9,w1,w2,w3,w4);
 
     Board b;
+    cout<< "Initial Board\n";
+    b.PrintBoard();
+    cout<< "\n\n";
 
     int player=1;
     int idx,nxturn;
     bool endg;
-
-    cout<< "Initial Board\n";
-
-    b.PrintBoard();
-
 
 
     while(true)
@@ -392,27 +623,20 @@ int main()
 
         if(player==1)
         {
-            cout<< "Player 1 turn\n";
-            cout<< "Choose index: ";
-            cin>> idx;
+            idx=p1.Getstartindex(b);
+            nxturn=b.UpdateBoard(1,idx);
 
-            nxturn=b.UpdateBoard(1,idx-1);
         }
 
         else if(player==2)
         {
-            cout<< "Player 2 turn\n";
-            cout<< "Choose index: ";
-            cin>> idx;
-
-            nxturn=b.UpdateBoard(2,idx-1);
+            idx=p2.Getstartindex(b);
+            nxturn=b.UpdateBoard(2,idx);
         }
 
 
         b.PrintBoard();
         player=nxturn;
-        continue;
-
     }
 
 
