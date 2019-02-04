@@ -626,59 +626,59 @@ public:
 int main()
 {
 
-    int w1=100;
-    int w2=50;
-    int w3=0;
-    int w4=0;
+    int counter1=0;
+    int counter2=0;
 
-    Player p1=Player(1,1,false,1,w1,w2,w3,w4);
-    Player p2=Player(1,1,false,1,w1,w2,w3,w4);
-
-    Board b;
-    cout<< "Initial Board\n";
-    b.PrintBoard();
-    cout<< "\n";
-
-    int player=1;
-    int idx,nxturn;
-    bool endg;
-
-
-    while(true)
+    for(int i=0; i<100; i++)
     {
-        endg=b.Endgame();
-        if(endg==true)
-            break;
+        int h=4;
 
-        if(player==1)
+        int w1=100;
+        int w2=90;
+        int w3=95;
+        int w4=91;
+
+        Player p1=Player(1,h,false,3,w1,w2,w3,w4);
+        Player p2=Player(2,h,false,3,w1,w2,w3,w4);
+
+        Board b;
+
+        int player=(rand()%2)+1;
+        int idx,nxturn;
+        bool endg;
+
+
+        while(true)
         {
-            idx=p1.Getstartindex(b);
+            endg=b.Endgame();
+            if(endg==true)
+                break;
 
-            cout<<"player1 selected: "<<(idx+1)<<endl;
-            nxturn=b.UpdateBoard(1,idx);
+            if(player==1)
+            {
+                idx=p1.Getstartindex(b);
+                nxturn=b.UpdateBoard(1,idx);
+            }
 
-            if(nxturn==player)
-                cout<<player<<" got additional move\n";
+            else if(player==2)
+            {
+                idx=p2.Getstartindex(b);
+                nxturn=b.UpdateBoard(2,idx);
+            }
+
+            player=nxturn;
         }
 
-        else if(player==2)
-        {
-            idx=p2.Getstartindex(b);
-
-            cout<<"player2 selected: "<<(idx+1)<<endl;
-            nxturn=b.UpdateBoard(2,idx);
-
-            if(nxturn==player)
-                cout<<player<<" got additional move\n";
-        }
+        if(b.Whoiswinner() == 1)
+            counter1++;
+        else if(b.Whoiswinner()==2)
+            counter2++;
 
 
-        b.PrintBoard();
-        player=nxturn;
     }
 
-
-    b.Winner();
+    cout<< "player 1 has won " << counter1 << "times" << endl;
+    cout<< "player 2 has won " << counter2 << "times" << endl;
 
     return 0;
 }
