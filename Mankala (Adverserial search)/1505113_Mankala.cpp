@@ -2,7 +2,7 @@
 #define INF 100000000
 #define _INF -100000000
 
-#define dbg printf("in\n")
+
 
 using namespace std;
 
@@ -628,18 +628,19 @@ int main()
 
     int counter1=0;
     int counter2=0;
+    int counter3=0;
 
     for(int i=0; i<100; i++)
     {
-        int h=4;
+
 
         int w1=100;
         int w2=90;
         int w3=95;
         int w4=91;
 
-        Player p1=Player(1,h,false,3,w1,w2,w3,w4);
-        Player p2=Player(2,h,false,3,w1,w2,w3,w4);
+        Player p1=Player(1,1,false,6,w1,w2,w3,w4);
+        Player p2=Player(2,2,false,6,w1,w2,w3,w4);
 
         Board b;
 
@@ -673,12 +674,14 @@ int main()
             counter1++;
         else if(b.Whoiswinner()==2)
             counter2++;
-
-
+        else
+            counter3++;
     }
 
-    cout<< "player 1 has won " << counter1 << "times" << endl;
-    cout<< "player 2 has won " << counter2 << "times" << endl;
+    cout<< "player 1 has won " << counter1 << " times" << endl;
+    cout<< "player 2 has won " << counter2 << " times" << endl;
+    cout<< "Match Draw "<< counter3 << " times" << endl;
+
 
     return 0;
 }
